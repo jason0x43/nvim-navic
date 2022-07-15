@@ -34,25 +34,14 @@ local function parse(symbols)
 
 		for index, val in ipairs(curr_symbol) do
 			local curr_parsed_symbol = {}
+			local scope
 
-			-- SymbolInformation detection
 			if val.range == nil then
-				if not vim.g.navic_silence then
-					vim.notify(
-						'nvim-navic: Server "'
-							.. vim.lsp.get_client_by_id(vim.b.navic_client_id).name
-							.. '" does not support documentSymbols, it responds with SymbolInformation format which has been deprecated in latest LSP specification.',
-						vim.log.levels.ERROR
-					)
-				end
-				vim.api.nvim_clear_autocmds({
-					buffer = vim.api.nvim_win_get_buf(0),
-					group = "navic",
-				})
-				return
+				scope = val.location.range
+			else
+				scope = val.range
 			end
 
-			local scope = val.range
 			scope["start"].line = scope["start"].line + 1
 			scope["end"].line = scope["end"].line + 1
 
